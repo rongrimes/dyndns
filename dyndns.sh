@@ -23,12 +23,14 @@
 #     Note: The dyndns token may need replacing from time to time. 
 #
 # Job jar:
-#   * publish to github
-#   * add note to say this script replaces dynsite
-#   * evaluate consequences if router or internet is not running
+#   * (none)
 #
 # Updates completed (from job jar):
 #   * move variables (username, token, hostname) to shell variables for ease of updating
+#   * publish to github
+#   * add note to say this script replaces dynsite
+#   * evaluate consequences of ip_file.txt not present
+#   * trap & abandon if router or internet is not running
 #
 # Ron G
 # May 2024
@@ -36,20 +38,40 @@
 ip_file=~/dyndns/ipfile.txt              # holds last ip address found
 logfile=~/dyndns/dyndns-log.txt          # log of updates
 lasttouch=~/dyndns/dyndns-lasttouch.txt  # last update - shows a heartbeat of the program
+credentials=~/dyndns/credentials.cfg     # my username, token, hostname to get IP assigned
 date_format='%F %R'
 
-source credentials.cfg                # initialize the folllowing fields
-#username=myusername                  # credentials used externally here to facilitate publishing to github
-#token=6D.............
+source $credentials                   # Initialize the folllowing fields
+#username=myusername                  # Credentials are stored externally
+#token=6D.............                #     to facilitate publishing the code to github
 #hostname=home.myhost.ca
 
 dyn_update="https://$username:$token@api.cp.easydns.com/dyn/generic.php?hostname=$hostname&myip=1.1.1.1"
 #echo $dyn_update
 
-stored_ip=`cat $ip_file`
-#stored_ip=1.2.3.4                # enable to force a change for testing purposes
+if [ -e $ip_file ]
+then
+	stored_ip=`cat $ip_file`
+else
+	stored_ip=1.2.3.4                # enable to force a change for testing purposes
+fi
 
-current_ip=`curl ifconfig.me/ip 2> /dev/null`   # flush off stuff in stderr
+current_ip=`curl --connect-timeout 2 ifconfig.me/ip 2> /dev/null`   # flush off stuff in stderr
+result=$?
+#echo curl = $result
+
+if [ $result = 28 ]   # Operation timeout. The specified time-out period was reached
+then	              # according to the curl conditions.
+	echo `date +"$date_format"`: Timeout to get IP address \(network down?\) | tee -a $logfile
+	echo
+	exit 1
+elif [ $result != 0 ]
+then
+	echo `date +"$date_format"`: Unknown error to get IP address \(curl = $result\) | tee -a $logfile
+	echo
+	exit 1
+fi
+
 #echo NAT: $current_ip
 
 if [ "$stored_ip" = "$current_ip" ]
