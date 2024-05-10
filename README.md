@@ -14,15 +14,17 @@ I thought it would be.
   * run manually
   * run via cron (preferred)
     crontab entry:
-         0,15,30,45 * * * * /home/ron/dyndns/dyndns.sh > /dev/null
-    Note: stdout is not needed. stderr will still go to mail for analysis. 
+    ```
+    0,15,30,45 * * * * /home/ron/dyndns/dyndns.sh > /dev/null 
+    #Note: stdout is not needed/wanted. stderr will still go to mail for analysis.
+    ```
 
 ### References:
-  * curl ifconfig.me (to get my IP address)
+  * curl ifconfig.me (to get my IP address)  
     https://opensource.com/article/18/5/how-find-ip-address-linux
 
-  * easyDNS refresh string info:
-    https://kb.easydns.com/knowledge/dynamic-dns/
+  * easyDNS refresh string info:  
+    https://kb.easydns.com/knowledge/dynamic-dns/  
     Note: The dyndns token may need replacing from time to time. 
 
 ### Job jar:
