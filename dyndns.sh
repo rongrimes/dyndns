@@ -74,7 +74,7 @@ result=$?
 
 if [ $result = 28 ]   # Operation timeout. The specified time-out period was reached
 then	              # according to the curl conditions.
-	if [ $status = $msg_timeout ]
+	if [ "$status" = "$msg_timeout" ]
 	then
 		touch $lasttouch
 		exit 1
@@ -89,15 +89,13 @@ then
 	echo `date +"$date_format"`: Unknown error to get IP address \(curl = $result\) | tee -a $logfile
 	echo
 	exit 1
-elif [ ${result:0:8} = "upstream" ]
+#elif [ ${result:0:8} = "upstream" ]
+elif [ ${current_ip:0:8} = "upstream" ]     # upstream request timeout
 then	
-	echo `date +"$date_format"`: $result | tee -a $logfile
+	echo `date +"$date_format"`: $result $current_ip | tee -a $logfile
 	echo
 	exit 1
 fi
-
-#echo NAT: $current_ip
-
 
 if [ "$stored_ip" = "$current_ip" ]
 then
