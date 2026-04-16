@@ -17,7 +17,7 @@
 # References:
 #   * curl ifconfig.me (to get my IP address)
 #     https://opensource.com/article/18/5/how-find-ip-address-linux
-#
+# 
 #   * easyDNS refresh string info:
 #     https://kb.easydns.com/knowledge/dynamic-dns/
 #     Note: The dyndns token may need replacing from time to time. 
@@ -26,6 +26,7 @@
 #   * handle long network downtime without filling up disk with error msgs [testing]
 #
 # Updates completed (from job jar):
+#   * Ln 93: Added quotes to current_ip
 #   * move variables (username, token, hostname) to shell variables for ease of updating
 #   * publish to github
 #   * add note to say this script replaces dynsite
@@ -90,7 +91,7 @@ then
 	echo
 	exit 1
 #elif [ ${result:0:8} = "upstream" ]
-elif [ ${current_ip:0:8} = "upstream" ]     # upstream request timeout
+elif [ "${current_ip:0:8}" = "upstream" ]     # upstream request timeout
 then	
 	echo `date +"$date_format"`: $result $current_ip | tee -a $logfile
 	echo
@@ -110,7 +111,8 @@ then
 fi
 
 # log "$stored_ip", "$current_ip" since they're sometimes giving spurious results
-echo \"$stored_ip\", \"$current_ip\" | tee -a $logfile
+# Not needed any longer?
+# echo \"$stored_ip\", \"$current_ip\" | tee -a $logfile
 
 # save the new ip
 echo $current_ip > $ip_file
